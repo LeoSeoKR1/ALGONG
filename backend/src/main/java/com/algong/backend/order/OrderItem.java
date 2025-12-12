@@ -30,4 +30,24 @@ public class OrderItem {
     void setOrder(Order order) {
         this.order = order;
     }
+
+    public Long getId() {
+        return id;
+    }
+
+    public Long getProductId() {
+        return productId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getPrice() {
+        return price;
+    }
+
+    public int getQuantity() {
+        return quantity;
+    }
 }

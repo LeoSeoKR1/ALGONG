@@ -36,4 +36,20 @@ public class Order {
     public long getId() {
         return id;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public int getTotalAmount() {
+        return totalAmount;
+    }
+
+    public List<OrderItem> getItems() {
+        return items;
+    }
 }
