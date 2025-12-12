@@ -24,7 +24,7 @@ export default function CheckoutSuccessPage() {
   useEffect(() => {
     if (!orderId) return;
 
-    fetch(`http://localhost:8080/orders/${orderId}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/orders/${orderId}`)
         .then(async (res) => {
             if (!res.ok) throw new Error("조회 실패");
             return res.json();
