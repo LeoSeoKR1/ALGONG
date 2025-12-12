@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 type Product = {
   id: number;
   name: string;
@@ -19,7 +21,9 @@ export default function ProductsPage() {
       <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {products.map((p) => (
           <li key={p.id} className="rounded-lg border p-4">
-            <div className="font-semibold">{p.name}</div>
+            <Link href={`/products/${p.id}`} className="font-semibold hover:underline">
+              {p.name}
+            </Link>
             <div className="mt-2 text-gray-700">{p.price.toLocaleString()}원</div>
             <button className="mt-4 w-full rounded-md bg-black py-2 text-white">
               장바구니 담기
