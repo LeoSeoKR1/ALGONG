@@ -29,7 +29,7 @@ export default function CheckoutPage() {
     setResult(null);
 
     try {
-      const res = await fetch("/api/orders", {
+      const res = await fetch("http://localhost:8080/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -44,12 +44,13 @@ export default function CheckoutPage() {
         }),
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.ok) {
+      const orderId = await res.json(); // Spring이 숫자만 반환
+      if (!res.ok) {
         throw new Error("주문 실패");
       }
 
-      setResult(`주문 성공! orderId = ${data.orderId}`);
+      setResult(`주문 성공! orderId = ${orderId}`);
+
     } catch (e) {
       setResult("주문 중 오류가 발생했습니다.");
     } finally {
