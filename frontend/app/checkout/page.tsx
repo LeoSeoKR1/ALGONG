@@ -2,9 +2,12 @@
 
 import { useMemo, useState } from "react";
 import { useCartStore } from "../store/cartStore";
+import { useRouter } from "next/navigation";
 
 export default function CheckoutPage() {
   const items = useCartStore((s) => s.items);
+  const clear = useCartStore((s) => s.clear);
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
@@ -42,20 +45,21 @@ export default function CheckoutPage() {
           })),
           total,
         }),
-      });
+     });
 
-      const orderId = await res.json(); // Spring이 숫자만 반환
-      if (!res.ok) {
-        throw new Error("주문 실패");
-      }
+  if (!res.ok) {
+    throw new Error("주문 실패");
+  }
 
-      setResult(`주문 성공! orderId = ${orderId}`);
+  clear(); // 주문 성공 후 장바구니 비우기
+  router.push('/checkout/success?orderId=${orderId}');
 
-    } catch (e) {
-      setResult("주문 중 오류가 발생했습니다.");
-    } finally {
-      setLoading(false);
-    }
+} catch (e) {
+  setResult("주문 중 오류가 발생했습니다.");
+} finally {
+  setLoading(false);
+}
+
   };
 
   return (
