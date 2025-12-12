@@ -27,6 +27,9 @@ export default function RootLayout({
               <Link href="/cart" className="text-gray-700 hover:underline">
                 Cart
               </Link>
+              <Link href="/checkout" className="text-gray-700 hover:underline">
+                Checkout
+              </Link>
             </nav>
           </div>
         </header>
