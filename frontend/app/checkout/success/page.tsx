@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { API_BASE } from "@/app/lib/api";
 
 type Order = {
   id: number;
@@ -20,23 +21,40 @@ export default function CheckoutSuccessPage() {
   const sp = useSearchParams();
   const orderId = sp.get("orderId");
   const [order, setOrder] = useState<Order | null>(null);
+  const [notFound, setNotFound] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!orderId) return;
+  if (!orderId) return;
 
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/orders/${orderId}`)
-        .then(async (res) => {
-            if (!res.ok) throw new Error("조회 실패");
-            return res.json();
-        })
-        .then(setOrder)
-        .catch(() => setOrder(null));
-  }, [orderId]);
+  const url = `${API_BASE}/orders/${orderId}`;
 
-  if (!order) {
-    return <p className="p-6">주문 정보를 불러오는 중...</p>;
-  }
+  fetch(url, { credentials: "include" })
+    .then(async (res) => {
+      if (res.status === 404) {
+        setNotFound(true);
+        return null;
+      }
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`${res.status} ${text}`);
+      }
+      return res.json();
+    })
+    .then((data) => {
+      if (data) setOrder(data);
+    })
+    .catch((e) => {
+      setError(e?.message ?? "주문 조회 중 오류");
+    });
+}, [orderId]);
 
+  // 렌더링 분기
+  if (notFound) return <p className="p-6">주문을 찾을 수 없습니다.</p>;
+  if (error) return <p className="p-6">오류: {error}</p>;
+  if (!order) return <p className="p-6">주문 정보를 불러오는 중...</p>;
+
+  // 정상 렌더링
   return (
     <main className="p-6">
       <h1 className="text-2xl font-bold">주문 완료 🎉</h1>

@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useCartStore } from "../store/cartStore";
 import { useRouter } from "next/navigation";
+import { API_BASE } from "@/app/lib/api";
 
 export default function CheckoutPage() {
   const items = useCartStore((s) => s.items);
@@ -32,9 +33,10 @@ export default function CheckoutPage() {
     setResult(null);
 
     try {
-      const res = await fetch('${process.env.NEXT_PUBLIC_API_BASE_URL}/orders', {
+      const res = await fetch(`${API_BASE}/orders`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({
           buyer: { email, address },
           items: items.map((it) => ({
@@ -45,20 +47,24 @@ export default function CheckoutPage() {
           })),
           total,
         }),
-     });
+      });
 
-  if (!res.ok) {
-    throw new Error("주문 실패");
-  }
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`주문 실패: ${res.status} ${text}`);
+      }
+
+  const orderId = await res.json(); // ✅ 여기서 숫자 받아오기
 
   clear(); // 주문 성공 후 장바구니 비우기
-  router.push('/checkout/success?orderId=${orderId}');
+  router.push(`/checkout/success?orderId=${orderId}`);
 
-} catch (e) {
-  setResult("주문 중 오류가 발생했습니다.");
+} catch (e: any) {
+  setResult(`주문 중 오류: ${e?.message ?? String(e)}`);
 } finally {
   setLoading(false);
 }
+
 
   };
 

@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useCartStore } from "../../store/cartStore";
+import { API_BASE } from "@/app/lib/api";
 
 type Product = {
   id: number;
@@ -17,16 +18,46 @@ export default function ProductDetailPage() {
 
   const [product, setProduct] = useState<Product | null>(null);
   const addItem = useCartStore((s) => s.addItem);
+  const [notFound, setNotFound] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!idStr) return;
 
-    fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/products/${idStr}`)
-      .then((res) => res.json())
-      .then((data) => setProduct(data));
-  }, [idStr]);
+ useEffect(() => {
+  if (!idStr) return;
 
-  if (!product) return <p className="p-6">로딩 중...</p>;
+  fetch(`${API_BASE}/products/${idStr}`)
+    .then(async (res) => {
+      if (res.status === 404) {
+        setNotFound(true);
+        return null;
+      }
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(`${res.status} ${text}`);
+      }
+      return res.json();
+    })
+    .then((data) => {
+      if (data) setProduct(data);
+    })
+    .catch((e) => {
+      setError(e?.message ?? "상품 조회 중 오류");
+    });
+}, [idStr]);
+
+
+  if (notFound) {
+  return <p className="p-6">상품이 없습니다.</p>;
+  }
+
+  if (error) {
+    return <p className="p-6">오류: {error}</p>;
+  }
+
+  if (!product) {
+    return <p className="p-6">로딩 중...</p>;
+  }
+
 
   return (
     <main className="p-6">

@@ -12,6 +12,8 @@ public class Order {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @Column(name = "user_email", nullable = false)
+    private String userEmail;
     private String email;
     private String address;
 
@@ -22,7 +24,8 @@ public class Order {
 
     protected Order() {}
 
-    public Order(String email, String address, int totalAmount) {
+    public Order(String userEmail, String email, String address, int totalAmount) {
+        this.userEmail = userEmail;
         this.email = email;
         this.address = address;
         this.totalAmount = totalAmount;
@@ -35,6 +38,10 @@ public class Order {
 
     public long getId() {
         return id;
+    }
+
+    public String getUserEmail() {
+        return userEmail;
     }
 
     public String getEmail() {
